@@ -59,22 +59,16 @@
       gap: 10px;
     }
 
-    .logo-icon {
-      background-color: var(--charcoal);
-      color: var(--bg-cream);
-      width: 38px;
-      height: 38px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: bold;
-      font-size: 1.2rem;
+    /* Logo MENU sur-mesure */
+    .logo-img {
+      width: 44px;
+      height: 44px;
+      object-fit: contain;
       flex-shrink: 0;
     }
 
     h1 {
-      font-size: 1.3rem;
+      font-size: 1.25rem;
       color: var(--charcoal);
       line-height: 1.1;
     }
@@ -151,7 +145,7 @@
       font-size: 1.05rem;
       font-weight: 800;
       color: var(--burgundy);
-      margin-bottom: 12px;
+      margin-bottom: 14px;
     }
 
     /* DESKTOP : Table en grille */
@@ -249,10 +243,10 @@
       min-height: 40px;
     }
 
-    /* MOBILE : Vue aérée et fluide sans doubles cadres */
+    /* MOBILE : Vue avec étiquettes verticales (-90°) */
     @media (max-width: 768px) {
       body {
-        padding: 8px;
+        padding: 6px;
       }
 
       .desktop-view {
@@ -262,7 +256,7 @@
       .mobile-view {
         display: flex;
         flex-direction: column;
-        gap: 16px;
+        gap: 14px;
       }
 
       .mobile-day-block {
@@ -298,19 +292,27 @@
       .mobile-row {
         display: flex;
         align-items: stretch;
-        gap: 8px;
+        gap: 6px;
       }
 
+      /* Étiquette verticale ultra compacte */
       .mobile-label-vert {
-        width: 55px;
+        width: 30px;
         flex-shrink: 0;
         display: flex;
         align-items: center;
         justify-content: center;
+        border-radius: 6px;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .mobile-label-vert span {
+        transform: rotate(-90deg);
+        white-space: nowrap;
         font-size: 0.7rem;
         font-weight: 800;
         color: white;
-        border-radius: 6px;
         text-transform: uppercase;
         letter-spacing: 0.5px;
       }
@@ -328,23 +330,19 @@
         background: #FFFDF9;
       }
 
+      /* Cases repas plus hautes sur mobile */
       .mobile-input-container textarea {
-        min-height: 42px;
+        min-height: 56px;
         font-size: 0.95rem;
       }
 
+      /* Case notes gardée compacte */
       .mobile-input-container.notes-input textarea {
         min-height: 32px;
       }
 
       header h1 {
         font-size: 1.1rem;
-      }
-
-      .logo-icon {
-        width: 32px;
-        height: 32px;
-        font-size: 1rem;
       }
     }
 
@@ -418,7 +416,16 @@
 
   <header>
     <div class="logo-title">
-      <div class="logo-icon">≡</div>
+      <!-- Logo Vectoriel structuré selon l'image transmise -->
+      <svg class="logo-img" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="50" cy="32" r="22" fill="none" stroke="#161311" stroke-width="6"/>
+        <line x1="38" y1="23" x2="62" y2="23" stroke="#161311" stroke-width="5" stroke-linecap="round"/>
+        <line x1="38" y1="32" x2="62" y2="32" stroke="#161311" stroke-width="5" stroke-linecap="round"/>
+        <line x1="38" y1="41" x2="62" y2="41" stroke="#161311" stroke-width="5" stroke-linecap="round"/>
+        <rect x="10" y="48" width="80" height="36" rx="18" fill="none" stroke="#161311" stroke-width="6"/>
+        <text x="50" y="73" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-weight="800" font-size="20" fill="#161311" text-anchor="middle" letter-spacing="2">MENU</text>
+      </svg>
+
       <div>
         <h1>Ardoise Repas</h1>
         <span id="sync-status" class="sync-status">🔄 Chargement...</span>
@@ -608,7 +615,7 @@
             </div>
           </div>
 
-          <!-- VUE MOBILE (Aérée & fluide sans doubles cadres) -->
+          <!-- VUE MOBILE (Étiquettes à la verticale -90°) -->
           <div class="mobile-view">
       `;
 
@@ -630,21 +637,21 @@
 
             <div class="mobile-day-rows">
               <div class="mobile-row">
-                <div class="mobile-label-vert row-midi">MIDI</div>
+                <div class="mobile-label-vert row-midi"><span>MIDI</span></div>
                 <div class="mobile-input-container ${todayInputClass}">
                   <textarea placeholder="+ Repas midi" data-key="${keyMidi}" oninput="handleInput(this)">${mealsData[keyMidi] || ''}</textarea>
                 </div>
               </div>
 
               <div class="mobile-row">
-                <div class="mobile-label-vert row-soir">SOIR</div>
+                <div class="mobile-label-vert row-soir"><span>SOIR</span></div>
                 <div class="mobile-input-container ${todayInputClass}">
                   <textarea placeholder="+ Repas soir" data-key="${keySoir}" oninput="handleInput(this)">${mealsData[keySoir] || ''}</textarea>
                 </div>
               </div>
 
               <div class="mobile-row">
-                <div class="mobile-label-vert row-notes">NOTES</div>
+                <div class="mobile-label-vert row-notes"><span>NOTES</span></div>
                 <div class="mobile-input-container notes-input ${todayInputClass}">
                   <textarea placeholder="Note du jour..." data-key="${keyNotes}" oninput="handleInput(this)">${mealsData[keyNotes] || ''}</textarea>
                 </div>
@@ -695,7 +702,7 @@
       renderApp();
     }
 
-    // Export PDF épuré identique à l'impression
+    // Export PDF épuré
     function exportToPDF() {
       updateSyncStatus("⏳ Génération PDF...");
       const monday = getMonday(currentDate);
