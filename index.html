@@ -38,7 +38,7 @@
       background-color: var(--bg-cream);
       color: var(--charcoal);
       padding: 12px;
-      max-width: 1200px;
+      max-width: 1250px;
       margin: 0 auto;
     }
 
@@ -209,13 +209,15 @@
     .row-soir { background-color: var(--burgundy); }
     .row-notes { background-color: var(--charcoal); }
 
-    /* Case plus haute sur PC pour accueillir au moins 5 lignes */
+    /* Case beaucoup plus haute sur desktop (140px) pour éviter tout défilement */
     .cell {
-      min-height: 95px;
+      min-height: 140px;
       background: #FAFAFA;
       border: 1px dashed var(--border-color);
       border-radius: 6px;
-      padding: 4px;
+      padding: 6px;
+      display: flex;
+      flex-direction: column;
     }
 
     .cell.today-cell {
@@ -230,7 +232,7 @@
       background: transparent;
       resize: none;
       outline: none;
-      font-size: 0.85rem;
+      font-size: 0.82rem;
       line-height: 1.3;
       color: var(--charcoal);
     }
@@ -241,7 +243,17 @@
     }
 
     .cell-notes {
-      min-height: 45px;
+      min-height: 55px;
+    }
+
+    /* Rendu texte statique pour PDF */
+    .static-text-val {
+      display: none;
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-size: 0.8rem;
+      line-height: 1.3;
+      color: #000000;
     }
 
     /* MOBILE : Vue avec étiquettes verticales (-90°) */
@@ -297,7 +309,6 @@
         gap: 6px;
       }
 
-      /* Étiquette verticale ultra compacte */
       .mobile-label-vert {
         width: 30px;
         flex-shrink: 0;
@@ -332,15 +343,14 @@
         background: #FFFDF9;
       }
 
-      /* Permet 5 lignes sur mobile sans être étouffé */
       .mobile-input-container textarea {
-        min-height: 80px;
+        min-height: 90px;
         font-size: 0.9rem;
         line-height: 1.35;
       }
 
       .mobile-input-container.notes-input textarea {
-        min-height: 40px;
+        min-height: 45px;
       }
 
       header h1 {
@@ -348,20 +358,21 @@
       }
     }
 
-    /* Mode PDF d'impression : espace généreux pour 5 lignes de texte */
+    /* Mode PDF d'impression : Rendu épuré, très haut, zéro scrollbar */
     .pdf-clean-mode {
       background: #FFFFFF !important;
       color: #000000 !important;
       border: 1px solid #000000 !important;
       box-shadow: none !important;
       border-radius: 0 !important;
-      padding: 8px !important;
+      padding: 10px !important;
+      width: 100% !important;
     }
 
     .pdf-clean-mode .week-header {
       color: #000000 !important;
-      font-size: 1rem !important;
-      margin-bottom: 8px !important;
+      font-size: 1.1rem !important;
+      margin-bottom: 12px !important;
     }
 
     .pdf-clean-mode .grid-header,
@@ -373,22 +384,25 @@
       border-radius: 0 !important;
     }
 
+    /* Hauteur généreuse garantie sur le PDF A4 */
     .pdf-clean-mode .cell {
-      min-height: 110px !important; /* Hauteur suffisante pour 5 lignes sur PDF */
+      min-height: 170px !important;
+      padding: 6px !important;
     }
 
     .pdf-clean-mode .cell-notes {
-      min-height: 45px !important;
+      min-height: 60px !important;
     }
 
+    /* Masquer le textarea interactif et afficher le texte brut pour éviter toute flèche */
     .pdf-clean-mode textarea {
-      color: #000000 !important;
-      font-size: 0.8rem !important;
-      line-height: 1.25 !important;
+      display: none !important;
     }
 
-    .pdf-clean-mode textarea::placeholder {
-      color: transparent !important;
+    .pdf-clean-mode .static-text-val {
+      display: block !important;
+      font-size: 0.82rem !important;
+      line-height: 1.3 !important;
     }
 
     /* Impression papier */
@@ -416,15 +430,18 @@
         padding: 10px !important;
       }
       .cell {
-        min-height: 110px !important;
+        min-height: 170px !important;
       }
-      .week-header, .grid-header, .row-label, .cell, textarea {
+      textarea {
+        display: none !important;
+      }
+      .static-text-val {
+        display: block !important;
+      }
+      .week-header, .grid-header, .row-label, .cell {
         background: #FFFFFF !important;
         color: #000000 !important;
         border-color: #000000 !important;
-      }
-      textarea::placeholder {
-        color: transparent !important;
       }
     }
   </style>
@@ -548,7 +565,6 @@
         date.getFullYear() === today.getFullYear();
     }
 
-    // Défiler automatiquement jusqu'au jour actuel
     function scrollToToday() {
       setTimeout(() => {
         const todayEl = document.getElementById('today-mobile-target');
@@ -558,16 +574,17 @@
       }, 200);
     }
 
-    function renderWeek(mondayDate) {
+    function renderWeek(mondayDate, isFirstWeek = false) {
       const monday = new Date(mondayDate);
       const sunday = new Date(monday);
       sunday.setDate(monday.getDate() + 6);
       const weekNum = getWeekNumber(monday);
 
       const dateRangeStr = `Semaine ${weekNum} : ${monday.getDate()} ${monday.toLocaleDateString('fr-FR', {month: 'short'})} – ${sunday.getDate()} ${sunday.toLocaleDateString('fr-FR', {month: 'short'})}`;
+      const blockId = isFirstWeek ? 'current-week-pdf-block' : '';
 
       let html = `
-        <div class="week-block" id="week-block-pdf">
+        <div class="week-block" ${blockId ? `id="${blockId}"` : ''}>
           <div class="week-header">
             📅 ${dateRangeStr}
           </div>
@@ -603,6 +620,7 @@
         html += `
           <div class="cell ${todayCell}">
             <textarea placeholder="+ Repas midi" data-key="${key}" oninput="handleInput(this)">${val}</textarea>
+            <div class="static-text-val">${val}</div>
           </div>
         `;
       }
@@ -619,6 +637,7 @@
         html += `
           <div class="cell ${todayCell}">
             <textarea placeholder="+ Repas soir" data-key="${key}" oninput="handleInput(this)">${val}</textarea>
+            <div class="static-text-val">${val}</div>
           </div>
         `;
       }
@@ -635,6 +654,7 @@
         html += `
           <div class="cell cell-notes ${todayCell}">
             <textarea placeholder="Note..." data-key="${key}" oninput="handleInput(this)">${val}</textarea>
+            <div class="static-text-val">${val}</div>
           </div>
         `;
       }
@@ -706,13 +726,21 @@
       mondayNext.setDate(mondayCurrent.getDate() + 7);
 
       container.innerHTML = 
-        renderWeek(mondayCurrent) + 
-        renderWeek(mondayNext);
+        renderWeek(mondayCurrent, true) + 
+        renderWeek(mondayNext, false);
     }
 
     function handleInput(textarea) {
       const key = textarea.getAttribute('data-key');
-      mealsData[key] = textarea.value;
+      const val = textarea.value;
+      mealsData[key] = val;
+
+      // Mettre à jour en direct le rendu texte statique pour le PDF
+      const parentCell = textarea.closest('.cell');
+      if (parentCell) {
+        const staticText = parentCell.querySelector('.static-text-val');
+        if (staticText) staticText.textContent = val;
+      }
 
       clearTimeout(saveTimeout);
       updateSyncStatus("✏️ Saisie...");
@@ -732,11 +760,13 @@
       scrollToToday();
     }
 
-    // Export PDF épuré
+    // Export PDF épuré haute résolution sans scrollbar
     function exportToPDF() {
       updateSyncStatus("⏳ Génération PDF...");
       const monday = getMonday(currentDate);
-      const element = document.getElementById('week-block-pdf');
+      const element = document.getElementById('current-week-pdf-block');
+
+      if (!element) return;
 
       const desktopView = element.querySelector('.desktop-view');
       const mobileView = element.querySelector('.mobile-view');
@@ -746,10 +776,10 @@
       element.classList.add('pdf-clean-mode');
 
       const opt = {
-        margin:       5,
+        margin:       4,
         filename:     `Ardoise_Repas_${formatDate(monday)}.pdf`,
         image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { scale: 2 },
+        html2canvas:  { scale: 2, useCORS: true },
         jsPDF:        { unit: 'mm', format: 'a4', orientation: 'landscape' }
       };
 
