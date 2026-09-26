@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ardoise Repas</title>
+  <title>Tous à Table !</title>
 
   <!-- Configuration PWA -->
   <link rel="manifest" href="manifest.json">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="apple-mobile-web-app-title" content="Ardoise Repas">
+  <meta name="apple-mobile-web-app-title" content="Tous à Table !">
   <meta name="theme-color" content="#161311">
 
   <!-- Bibliothèque PDF -->
@@ -42,7 +42,7 @@
       margin: 0 auto;
     }
 
-    /* En-tête */
+    /* En-tête épuré sans icône */
     header {
       display: flex;
       justify-content: space-between;
@@ -53,23 +53,17 @@
       gap: 8px;
     }
 
-    .logo-title {
+    .app-title-container {
       display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .logo-img {
-      width: 44px;
-      height: 44px;
-      object-fit: contain;
-      flex-shrink: 0;
+      flex-direction: column;
     }
 
     h1 {
-      font-size: 1.25rem;
+      font-size: 1.4rem;
+      font-weight: 800;
       color: var(--charcoal);
       line-height: 1.1;
+      letter-spacing: -0.3px;
     }
 
     .sync-status {
@@ -77,6 +71,7 @@
       font-weight: 600;
       color: #2E7D32;
       display: block;
+      margin-top: 2px;
     }
 
     /* Barre de boutons compacte */
@@ -209,7 +204,6 @@
     .row-soir { background-color: var(--burgundy); }
     .row-notes { background-color: var(--charcoal); }
 
-    /* Case haute sur desktop (140px) */
     .cell {
       min-height: 140px;
       background: #FAFAFA;
@@ -353,7 +347,7 @@
       }
 
       header h1 {
-        font-size: 1.1rem;
+        font-size: 1.2rem;
       }
     }
 
@@ -445,20 +439,9 @@
 <body>
 
   <header>
-    <div class="logo-title">
-      <svg class="logo-img" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="50" cy="32" r="22" fill="none" stroke="#161311" stroke-width="6"/>
-        <line x1="38" y1="23" x2="62" y2="23" stroke="#161311" stroke-width="5" stroke-linecap="round"/>
-        <line x1="38" y1="32" x2="62" y2="32" stroke="#161311" stroke-width="5" stroke-linecap="round"/>
-        <line x1="38" y1="41" x2="62" y2="41" stroke="#161311" stroke-width="5" stroke-linecap="round"/>
-        <rect x="10" y="48" width="80" height="36" rx="18" fill="none" stroke="#161311" stroke-width="6"/>
-        <text x="50" y="73" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-weight="800" font-size="20" fill="#161311" text-anchor="middle" letter-spacing="2">MENU</text>
-      </svg>
-
-      <div>
-        <h1>Ardoise Repas</h1>
-        <span id="sync-status" class="sync-status">🔄 Chargement...</span>
-      </div>
+    <div class="app-title-container">
+      <h1>Tous à Table !</h1>
+      <span id="sync-status" class="sync-status">🔄 Chargement...</span>
     </div>
     <div class="controls">
       <button class="btn-nav" onclick="changeWeek(-1)" title="Semaine précédente">«</button>
@@ -535,7 +518,6 @@
       }
     }
 
-    // CORRECTION DATE LOCALE SANS DECALAGE UTC
     function getMonday(d) {
       const date = new Date(d.getFullYear(), d.getMonth(), d.getDate());
       const day = date.getDay();
@@ -779,7 +761,7 @@
 
       const opt = {
         margin:       4,
-        filename:     `Ardoise_Repas_${formatDate(monday)}.pdf`,
+        filename:     `Tous_a_Table_${formatDate(monday)}.pdf`,
         image:        { type: 'jpeg', quality: 0.98 },
         html2canvas:  { scale: 2, useCORS: true },
         jsPDF:        { unit: 'mm', format: 'a4', orientation: 'landscape' }
