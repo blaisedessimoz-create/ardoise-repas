@@ -1,6 +1,6 @@
 {
-  "name": "Ardoise Repas",
-  "short_name": "Ardoise",
+  "name": "Tous à Table !",
+  "short_name": "Tous à Table",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#F2EFE9",
