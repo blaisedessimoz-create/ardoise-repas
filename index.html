@@ -4,6 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Ardoise Repas</title>
+
+  <!-- Configurations pour transformer le raccourci en vraie Application Mobile (PWA) -->
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Ardoise Repas">
+  <meta name="theme-color" content="#161311">
+
   <style>
     :root {
       --bg-cream: #F2EFE9;
@@ -331,7 +339,7 @@
       }
     }
 
-    // Charger les données depuis le coffre-fort cloud npoint.io
+    // Charger les données depuis npoint.io
     async function loadCloudData() {
       updateSyncStatus("🔄 Chargement...");
       try {
@@ -339,7 +347,6 @@
         if (res.ok) {
           const data = await res.json();
           mealsData = data || {};
-          // Sauvegarde miroir dans le localStorage
           localStorage.setItem('ardoise_meals', JSON.stringify(mealsData));
           updateSyncStatus("🟢 Synchronisé");
           renderApp();
@@ -355,7 +362,7 @@
       }
     }
 
-    // Envoyer les données vers le coffre-fort cloud npoint.io
+    // Envoyer les données vers npoint.io
     async function saveCloudData() {
       updateSyncStatus("💾 Enregistrement...");
       localStorage.setItem('ardoise_meals', JSON.stringify(mealsData));
@@ -413,7 +420,6 @@
               <div class="grid-header">JOUR</div>
       `;
 
-      // Colonnes Jours
       for (let i = 0; i < 7; i++) {
         const dayDate = new Date(monday);
         dayDate.setDate(monday.getDate() + i);
@@ -500,7 +506,6 @@
       const key = textarea.getAttribute('data-key');
       mealsData[key] = textarea.value;
 
-      // Anti-rebond (debounce) : attend 800ms de pause dans la frappe avant d'envoyer au cloud
       clearTimeout(saveTimeout);
       updateSyncStatus("✏️ Saisie en cours...");
       saveTimeout = setTimeout(() => {
@@ -518,7 +523,6 @@
       renderApp();
     }
 
-    // Démarrage : chargement des données depuis npoint.io
     loadCloudData();
   </script>
 </body>
