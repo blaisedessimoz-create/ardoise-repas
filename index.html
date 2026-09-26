@@ -13,7 +13,7 @@
   <meta name="apple-mobile-web-app-title" content="Ardoise Repas">
   <meta name="theme-color" content="#161311">
 
-  <!-- Bibliothèque pour générer le PDF -->
+  <!-- Bibliothèque PDF -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
   <style>
@@ -37,7 +37,7 @@
     body {
       background-color: var(--bg-cream);
       color: var(--charcoal);
-      padding: 16px;
+      padding: 12px;
       max-width: 1200px;
       margin: 0 auto;
     }
@@ -47,114 +47,111 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 20px;
-      padding-bottom: 12px;
+      margin-bottom: 16px;
+      padding-bottom: 10px;
       border-bottom: 2px solid var(--border-color);
-      flex-wrap: wrap;
-      gap: 12px;
+      gap: 8px;
     }
 
     .logo-title {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
     }
 
     .logo-icon {
       background-color: var(--charcoal);
       color: var(--bg-cream);
-      width: 42px;
-      height: 42px;
+      width: 38px;
+      height: 38px;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
       font-weight: bold;
-      font-size: 1.3rem;
+      font-size: 1.2rem;
       flex-shrink: 0;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
     }
 
     h1 {
-      font-size: 1.4rem;
+      font-size: 1.3rem;
       color: var(--charcoal);
       line-height: 1.1;
     }
 
     .sync-status {
-      font-size: 0.8rem;
+      font-size: 0.75rem;
       font-weight: 600;
       color: #2E7D32;
       display: block;
-      margin-top: 2px;
     }
 
+    /* Barre de boutons compacte */
     .controls {
       display: flex;
       align-items: center;
-      gap: 8px;
-      flex-wrap: wrap;
+      gap: 6px;
     }
 
     button {
       cursor: pointer;
       border: none;
-      border-radius: 8px;
-      padding: 8px 14px;
+      border-radius: 6px;
+      padding: 8px 10px;
       font-weight: 600;
-      font-size: 0.9rem;
+      font-size: 0.85rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
       transition: background-color 0.2s, transform 0.1s;
     }
 
     button:active {
-      transform: scale(0.97);
+      transform: scale(0.96);
     }
 
-    .btn-secondary {
+    .btn-nav {
       background-color: #E6E1D7;
       color: var(--charcoal);
+      font-size: 1rem;
+      padding: 8px 12px;
     }
 
-    .btn-secondary:hover {
-      background-color: #DAD4C7;
-    }
-
-    .btn-primary {
-      background-color: var(--burgundy);
-      color: #FFFFFF;
-    }
-
-    .btn-primary:hover {
-      background-color: var(--burgundy-hover);
+    .btn-today {
+      background-color: #E6E1D7;
+      color: var(--charcoal);
+      font-size: 0.85rem;
     }
 
     .btn-pdf {
       background-color: #2E7D32;
       color: #FFFFFF;
+      font-size: 1.1rem;
+      padding: 8px 10px;
     }
 
-    .btn-pdf:hover {
-      background-color: #236127;
+    .btn-primary {
+      background-color: var(--burgundy);
+      color: #FFFFFF;
+      font-size: 0.85rem;
     }
 
     /* Bloc Semaine */
     .week-block {
-      margin-bottom: 28px;
+      margin-bottom: 24px;
       background: var(--card-bg);
       border-radius: 12px;
-      padding: 16px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+      padding: 14px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
       border: 1px solid var(--border-color);
     }
 
     .week-header {
-      font-size: 1.1rem;
-      font-weight: bold;
+      font-size: 1.05rem;
+      font-weight: 800;
       color: var(--burgundy);
-      margin-bottom: 16px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
+      margin-bottom: 12px;
     }
 
     /* DESKTOP : Table en grille */
@@ -168,17 +165,17 @@
 
     .grid-table {
       display: grid;
-      grid-template-columns: 80px repeat(7, 1fr);
-      gap: 8px;
+      grid-template-columns: 75px repeat(7, 1fr);
+      gap: 6px;
     }
 
     .grid-header {
       font-weight: bold;
       text-align: center;
-      padding: 8px;
+      padding: 6px;
       background-color: var(--bg-cream);
       border-radius: 6px;
-      font-size: 0.85rem;
+      font-size: 0.8rem;
       text-transform: uppercase;
     }
 
@@ -190,7 +187,7 @@
     }
 
     .day-header .date-num {
-      font-size: 1.1rem;
+      font-size: 1rem;
       font-weight: 800;
       color: var(--charcoal);
     }
@@ -209,7 +206,7 @@
       align-items: center;
       justify-content: center;
       font-weight: bold;
-      font-size: 0.8rem;
+      font-size: 0.75rem;
       border-radius: 6px;
       color: white;
       text-transform: uppercase;
@@ -220,11 +217,11 @@
     .row-notes { background-color: var(--charcoal); }
 
     .cell {
-      min-height: 70px;
+      min-height: 65px;
       background: #FAFAFA;
       border: 1px dashed var(--border-color);
       border-radius: 6px;
-      padding: 6px;
+      padding: 4px;
     }
 
     .cell.today-cell {
@@ -249,13 +246,13 @@
     }
 
     .cell-notes {
-      min-height: 45px;
+      min-height: 40px;
     }
 
-    /* MOBILE : Vue simplifiée sous forme de cartes verticales */
+    /* MOBILE : Vue aérée et fluide sans doubles cadres */
     @media (max-width: 768px) {
       body {
-        padding: 10px;
+        padding: 8px;
       }
 
       .desktop-view {
@@ -265,75 +262,93 @@
       .mobile-view {
         display: flex;
         flex-direction: column;
-        gap: 12px;
+        gap: 16px;
       }
 
-      .mobile-day-card {
-        background: #FAFAFA;
-        border: 1px solid var(--border-color);
-        border-radius: 10px;
-        padding: 12px;
+      .mobile-day-block {
+        padding-bottom: 12px;
+        border-bottom: 1px solid var(--border-color);
       }
 
-      .mobile-day-card.today-card {
-        border: 2px solid var(--ochre);
-        background: #FFFDF9;
+      .mobile-day-block:last-child {
+        border-bottom: none;
+        padding-bottom: 0;
       }
 
       .mobile-day-title {
         font-weight: 800;
-        font-size: 1rem;
-        padding-bottom: 8px;
-        margin-bottom: 10px;
-        border-bottom: 1px solid var(--border-color);
+        font-size: 0.95rem;
+        margin-bottom: 8px;
+        color: var(--charcoal);
         display: flex;
-        justify-content: space-between;
         align-items: center;
+        gap: 6px;
       }
 
       .mobile-day-title.today-title {
         color: var(--ochre);
       }
 
-      .mobile-section {
-        margin-bottom: 8px;
+      .mobile-day-rows {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
       }
 
-      .mobile-section-label {
-        font-size: 0.75rem;
-        font-weight: 700;
-        text-transform: uppercase;
-        padding: 2px 6px;
-        border-radius: 4px;
+      .mobile-row {
+        display: flex;
+        align-items: stretch;
+        gap: 8px;
+      }
+
+      .mobile-label-vert {
+        width: 55px;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.7rem;
+        font-weight: 800;
         color: white;
-        display: inline-block;
-        margin-bottom: 4px;
+        border-radius: 6px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
       }
 
-      .mobile-input {
-        width: 100%;
-        min-height: 48px;
-        background: white;
+      .mobile-input-container {
+        flex-grow: 1;
+        background: #FAFAFA;
         border: 1px solid var(--border-color);
         border-radius: 6px;
-        padding: 8px;
+        padding: 6px 8px;
+      }
+
+      .mobile-input-container.today-input {
+        border: 1px solid var(--ochre);
+        background: #FFFDF9;
+      }
+
+      .mobile-input-container textarea {
+        min-height: 42px;
         font-size: 0.95rem;
       }
 
-      .controls {
-        width: 100%;
-        justify-content: space-between;
+      .mobile-input-container.notes-input textarea {
+        min-height: 32px;
       }
 
-      .controls button {
-        flex: 1;
-        text-align: center;
-        padding: 10px 4px;
-        font-size: 0.78rem;
+      header h1 {
+        font-size: 1.1rem;
+      }
+
+      .logo-icon {
+        width: 32px;
+        height: 32px;
+        font-size: 1rem;
       }
     }
 
-    /* Style temporaire applique lors de l'export PDF (Rendu simple N&B) */
+    /* Style temporaire appliqué lors de l'export PDF (Rendu simple N&B) */
     .pdf-clean-mode {
       background: #FFFFFF !important;
       color: #000000 !important;
@@ -410,16 +425,16 @@
       </div>
     </div>
     <div class="controls">
-      <button class="btn-secondary" onclick="changeWeek(-1)">‹ Précédent</button>
-      <button class="btn-secondary" onclick="resetToCurrentWeek()">Aujourd'hui</button>
-      <button class="btn-secondary" onclick="changeWeek(1)">Suivant ›</button>
-      <button class="btn-pdf" onclick="exportToPDF()">📄 Télécharger PDF</button>
+      <button class="btn-nav" onclick="changeWeek(-1)" title="Semaine précédente">«</button>
+      <button class="btn-today" onclick="resetToCurrentWeek()">Aujourd'hui</button>
+      <button class="btn-nav" onclick="changeWeek(1)" title="Semaine suivante">»</button>
+      <button class="btn-pdf" onclick="exportToPDF()" title="Télécharger le PDF">📄</button>
       <button class="btn-primary" onclick="window.print()">🖨️ Imprimer</button>
     </div>
   </header>
 
   <main id="app-container">
-    <!-- Contenu injecte dynamiquement -->
+    <!-- Contenu injecté dynamiquement -->
   </main>
 
   <script>
@@ -489,6 +504,14 @@
       return new Date(date.setDate(diff));
     }
 
+    function getWeekNumber(d) {
+      const date = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+      const dayNum = date.getUTCDay() || 7;
+      date.setUTCDate(date.getUTCDate() + 4 - dayNum);
+      const yearStart = new Date(Date.UTC(date.getUTCFullYear(), 0, 1));
+      return Math.ceil((((date - yearStart) / 86400000) + 1) / 7);
+    }
+
     function formatDate(date) {
       return date.toISOString().split('T')[0];
     }
@@ -500,17 +523,18 @@
         date.getFullYear() === today.getFullYear();
     }
 
-    function renderWeek(mondayDate, titleLabel) {
+    function renderWeek(mondayDate) {
       const monday = new Date(mondayDate);
       const sunday = new Date(monday);
       sunday.setDate(monday.getDate() + 6);
+      const weekNum = getWeekNumber(monday);
 
-      const dateRangeStr = `${monday.getDate()} ${monday.toLocaleDateString('fr-FR', {month: 'short'})} – ${sunday.getDate()} ${sunday.toLocaleDateString('fr-FR', {month: 'short'})} ${sunday.getFullYear()}`;
+      const dateRangeStr = `Semaine ${weekNum} : ${monday.getDate()} ${monday.toLocaleDateString('fr-FR', {month: 'short'})} – ${sunday.getDate()} ${sunday.toLocaleDateString('fr-FR', {month: 'short'})}`;
 
       let html = `
         <div class="week-block" id="week-block-pdf">
           <div class="week-header">
-            📅 ${titleLabel} (${dateRangeStr})
+            📅 ${dateRangeStr}
           </div>
 
           <!-- VUE DESKTOP (Grille) -->
@@ -584,39 +608,47 @@
             </div>
           </div>
 
-          <!-- VUE MOBILE (Cartes par jour) -->
+          <!-- VUE MOBILE (Aérée & fluide sans doubles cadres) -->
           <div class="mobile-view">
       `;
 
       for (let i = 0; i < 7; i++) {
         const dayDate = new Date(monday);
         dayDate.setDate(monday.getDate() + i);
-        const todayClass = isToday(dayDate) ? 'today-card' : '';
         const todayTitleClass = isToday(dayDate) ? 'today-title' : '';
+        const todayInputClass = isToday(dayDate) ? 'today-input' : '';
         const keyMidi = `${formatDate(dayDate)}_midi`;
         const keySoir = `${formatDate(dayDate)}_soir`;
         const keyNotes = `${formatDate(dayDate)}_notes`;
 
         html += `
-          <div class="mobile-day-card ${todayClass}">
+          <div class="mobile-day-block">
             <div class="mobile-day-title ${todayTitleClass}">
               <span>${DAYS[i]} ${dayDate.getDate()} ${dayDate.toLocaleDateString('fr-FR', {month: 'short'})}</span>
               ${isToday(dayDate) ? '<span>• Aujourd\'hui</span>' : ''}
             </div>
 
-            <div class="mobile-section">
-              <span class="mobile-section-label row-midi">MIDI</span>
-              <textarea class="mobile-input" placeholder="+ Repas midi" data-key="${keyMidi}" oninput="handleInput(this)">${mealsData[keyMidi] || ''}</textarea>
-            </div>
+            <div class="mobile-day-rows">
+              <div class="mobile-row">
+                <div class="mobile-label-vert row-midi">MIDI</div>
+                <div class="mobile-input-container ${todayInputClass}">
+                  <textarea placeholder="+ Repas midi" data-key="${keyMidi}" oninput="handleInput(this)">${mealsData[keyMidi] || ''}</textarea>
+                </div>
+              </div>
 
-            <div class="mobile-section">
-              <span class="mobile-section-label row-soir">SOIR</span>
-              <textarea class="mobile-input" placeholder="+ Repas soir" data-key="${keySoir}" oninput="handleInput(this)">${mealsData[keySoir] || ''}</textarea>
-            </div>
+              <div class="mobile-row">
+                <div class="mobile-label-vert row-soir">SOIR</div>
+                <div class="mobile-input-container ${todayInputClass}">
+                  <textarea placeholder="+ Repas soir" data-key="${keySoir}" oninput="handleInput(this)">${mealsData[keySoir] || ''}</textarea>
+                </div>
+              </div>
 
-            <div class="mobile-section">
-              <span class="mobile-section-label row-notes">NOTES</span>
-              <textarea class="mobile-input" placeholder="Note du jour..." data-key="${keyNotes}" oninput="handleInput(this)">${mealsData[keyNotes] || ''}</textarea>
+              <div class="mobile-row">
+                <div class="mobile-label-vert row-notes">NOTES</div>
+                <div class="mobile-input-container notes-input ${todayInputClass}">
+                  <textarea placeholder="Note du jour..." data-key="${keyNotes}" oninput="handleInput(this)">${mealsData[keyNotes] || ''}</textarea>
+                </div>
+              </div>
             </div>
           </div>
         `;
@@ -638,8 +670,8 @@
       mondayNext.setDate(mondayCurrent.getDate() + 7);
 
       container.innerHTML = 
-        renderWeek(mondayCurrent, "Cette semaine") + 
-        renderWeek(mondayNext, "Semaine prochaine");
+        renderWeek(mondayCurrent) + 
+        renderWeek(mondayNext);
     }
 
     function handleInput(textarea) {
@@ -669,7 +701,6 @@
       const monday = getMonday(currentDate);
       const element = document.getElementById('week-block-pdf');
 
-      // Forcer l'affichage de la grille Desktop et appliquer le mode simple N&B
       const desktopView = element.querySelector('.desktop-view');
       const mobileView = element.querySelector('.mobile-view');
       
@@ -686,7 +717,6 @@
       };
 
       html2pdf().set(opt).from(element).save().then(() => {
-        // Restaurer la vue normale
         element.classList.remove('pdf-clean-mode');
         if (desktopView) desktopView.style.display = '';
         if (mobileView) mobileView.style.display = '';
