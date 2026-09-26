@@ -66,6 +66,12 @@
       color: var(--charcoal);
     }
 
+    .sync-status {
+      font-size: 0.8rem;
+      color: #666;
+      margin-left: 8px;
+    }
+
     .controls {
       display: flex;
       align-items: center;
@@ -227,7 +233,6 @@
       .grid-container {
         overflow-x: auto;
       }
-      /* Masquer la 2ème semaine sur très petit écran pour alléger */
       .next-week-block {
         display: none;
       }
@@ -240,7 +245,7 @@
         color: #000000 !important;
         padding: 0 !important;
       }
-      header, .controls, .btn-primary, .btn-secondary {
+      header, .controls, .btn-primary, .btn-secondary, .sync-status {
         display: none !important;
       }
       .week-block {
@@ -293,7 +298,10 @@
   <header>
     <div class="logo-title">
       <div class="logo-icon">≡</div>
-      <h1>Ardoise Repas</h1>
+      <div>
+        <h1>Ardoise Repas</h1>
+        <span id="sync-status" class="sync-status">🟢 Synchronisé</span>
+      </div>
     </div>
     <div class="controls">
       <button class="btn-secondary" onclick="changeWeek(-1)">‹ Semaine précédente</button>
@@ -308,9 +316,66 @@
   </main>
 
   <script>
+    const NPOINT_URL = "https://api.npoint.io/28a88f1381fa2b45b752";
     let currentDate = new Date();
+    let mealsData = {};
+    let saveTimeout = null;
 
     const DAYS = ['LUN', 'MAR', 'MER', 'JEU', 'VEN', 'SAM', 'DIM'];
+
+    function updateSyncStatus(status, isError = false) {
+      const statusEl = document.getElementById('sync-status');
+      if (statusEl) {
+        statusEl.textContent = status;
+        statusEl.style.color = isError ? '#9E2A2B' : '#666';
+      }
+    }
+
+    // Charger les données depuis le coffre-fort cloud npoint.io
+    async function loadCloudData() {
+      updateSyncStatus("🔄 Chargement...");
+      try {
+        const res = await fetch(NPOINT_URL);
+        if (res.ok) {
+          const data = await res.json();
+          mealsData = data || {};
+          // Sauvegarde miroir dans le localStorage
+          localStorage.setItem('ardoise_meals', JSON.stringify(mealsData));
+          updateSyncStatus("🟢 Synchronisé");
+          renderApp();
+        } else {
+          throw new Error("Erreur de réponse");
+        }
+      } catch (err) {
+        console.warn("Mode hors-ligne / Erreur cloud, chargement local", err);
+        const local = localStorage.getItem('ardoise_meals');
+        if (local) mealsData = JSON.parse(local);
+        updateSyncStatus("🟧 Mode hors-ligne", true);
+        renderApp();
+      }
+    }
+
+    // Envoyer les données vers le coffre-fort cloud npoint.io
+    async function saveCloudData() {
+      updateSyncStatus("💾 Enregistrement...");
+      localStorage.setItem('ardoise_meals', JSON.stringify(mealsData));
+
+      try {
+        const res = await fetch(NPOINT_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(mealsData)
+        });
+        if (res.ok) {
+          updateSyncStatus("🟢 Synchronisé");
+        } else {
+          throw new Error("Erreur d'enregistrement");
+        }
+      } catch (err) {
+        console.error("Erreur de sauvegarde cloud", err);
+        updateSyncStatus("⚠️ Erreur de synchro", true);
+      }
+    }
 
     function getMonday(d) {
       const date = new Date(d);
@@ -368,12 +433,12 @@
         const dayDate = new Date(monday);
         dayDate.setDate(monday.getDate() + i);
         const key = `${formatDate(dayDate)}_midi`;
-        const val = localStorage.getItem(key) || '';
+        const val = mealsData[key] || '';
         const todayCell = isToday(dayDate) ? 'today-cell' : '';
 
         html += `
           <div class="cell ${todayCell}">
-            <textarea placeholder="+ Repas midi" data-key="${key}" oninput="saveData(this)">${val}</textarea>
+            <textarea placeholder="+ Repas midi" data-key="${key}" oninput="handleInput(this)">${val}</textarea>
           </div>
         `;
       }
@@ -384,12 +449,12 @@
         const dayDate = new Date(monday);
         dayDate.setDate(monday.getDate() + i);
         const key = `${formatDate(dayDate)}_soir`;
-        const val = localStorage.getItem(key) || '';
+        const val = mealsData[key] || '';
         const todayCell = isToday(dayDate) ? 'today-cell' : '';
 
         html += `
           <div class="cell ${todayCell}">
-            <textarea placeholder="+ Repas soir" data-key="${key}" oninput="saveData(this)">${val}</textarea>
+            <textarea placeholder="+ Repas soir" data-key="${key}" oninput="handleInput(this)">${val}</textarea>
           </div>
         `;
       }
@@ -400,12 +465,12 @@
         const dayDate = new Date(monday);
         dayDate.setDate(monday.getDate() + i);
         const key = `${formatDate(dayDate)}_notes`;
-        const val = localStorage.getItem(key) || '';
+        const val = mealsData[key] || '';
         const todayCell = isToday(dayDate) ? 'today-cell' : '';
 
         html += `
           <div class="cell cell-notes ${todayCell}">
-            <textarea placeholder="Note du jour..." data-key="${key}" oninput="saveData(this)">${val}</textarea>
+            <textarea placeholder="Note du jour..." data-key="${key}" oninput="handleInput(this)">${val}</textarea>
           </div>
         `;
       }
@@ -431,9 +496,16 @@
         renderWeek(mondayNext, "Semaine prochaine", "next-week-block");
     }
 
-    function saveData(textarea) {
+    function handleInput(textarea) {
       const key = textarea.getAttribute('data-key');
-      localStorage.setItem(key, textarea.value);
+      mealsData[key] = textarea.value;
+
+      // Anti-rebond (debounce) : attend 800ms de pause dans la frappe avant d'envoyer au cloud
+      clearTimeout(saveTimeout);
+      updateSyncStatus("✏️ Saisie en cours...");
+      saveTimeout = setTimeout(() => {
+        saveCloudData();
+      }, 800);
     }
 
     function changeWeek(direction) {
@@ -446,8 +518,8 @@
       renderApp();
     }
 
-    // Initialisation au chargement
-    renderApp();
+    // Démarrage : chargement des données depuis npoint.io
+    loadCloudData();
   </script>
 </body>
 </html>
