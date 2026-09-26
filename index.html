@@ -4,8 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Ardoise Repas</title>
-<link rel="manifest" href="manifest.json">
-  <!-- Configurations pour transformer le raccourci en vraie Application Mobile (PWA) -->
+
+  <!-- Lien vers le Manifest et configurations PWA -->
+  <link rel="manifest" href="manifest.json">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -75,7 +76,8 @@
     }
 
     .sync-status {
-      font-size: 0.8rem;
+      font-size: 0.85rem;
+      font-weight: 600;
       color: #666;
       margin-left: 8px;
     }
@@ -228,7 +230,7 @@
       min-height: 45px;
     }
 
-    /* Adaptive Mobile View */
+    /* Mobile View */
     .next-week-block {
       display: block;
     }
@@ -308,7 +310,7 @@
       <div class="logo-icon">≡</div>
       <div>
         <h1>Ardoise Repas</h1>
-        <span id="sync-status" class="sync-status">🟢 Synchronisé</span>
+        <span id="sync-status" class="sync-status">🔄 Chargement...</span>
       </div>
     </div>
     <div class="controls">
@@ -335,15 +337,14 @@
       const statusEl = document.getElementById('sync-status');
       if (statusEl) {
         statusEl.textContent = status;
-        statusEl.style.color = isError ? '#9E2A2B' : '#666';
+        statusEl.style.color = isError ? '#9E2A2B' : '#2E7D32';
       }
     }
 
-    // Charger les données depuis npoint.io
     async function loadCloudData() {
       updateSyncStatus("🔄 Chargement...");
       try {
-        const res = await fetch(NPOINT_URL);
+        const res = await fetch(NPOINT_URL, { cache: 'no-cache' });
         if (res.ok) {
           const data = await res.json();
           mealsData = data || {};
@@ -351,18 +352,17 @@
           updateSyncStatus("🟢 Synchronisé");
           renderApp();
         } else {
-          throw new Error("Erreur de réponse");
+          throw new Error("Erreur cloud");
         }
       } catch (err) {
-        console.warn("Mode hors-ligne / Erreur cloud, chargement local", err);
+        console.warn("Chargement hors-ligne", err);
         const local = localStorage.getItem('ardoise_meals');
         if (local) mealsData = JSON.parse(local);
-        updateSyncStatus("🟧 Mode hors-ligne", true);
+        updateSyncStatus("🟧 Mode local (hors-ligne)", true);
         renderApp();
       }
     }
 
-    // Envoyer les données vers npoint.io
     async function saveCloudData() {
       updateSyncStatus("💾 Enregistrement...");
       localStorage.setItem('ardoise_meals', JSON.stringify(mealsData));
@@ -376,10 +376,10 @@
         if (res.ok) {
           updateSyncStatus("🟢 Synchronisé");
         } else {
-          throw new Error("Erreur d'enregistrement");
+          throw new Error("Erreur de sauvegarde");
         }
       } catch (err) {
-        console.error("Erreur de sauvegarde cloud", err);
+        console.error("Erreur synchro cloud", err);
         updateSyncStatus("⚠️ Erreur de synchro", true);
       }
     }
@@ -416,7 +416,6 @@
           </div>
           <div class="grid-container">
             <div class="grid-table">
-              <!-- En-tête Jours -->
               <div class="grid-header">JOUR</div>
       `;
 
@@ -507,7 +506,7 @@
       mealsData[key] = textarea.value;
 
       clearTimeout(saveTimeout);
-      updateSyncStatus("✏️ Saisie en cours...");
+      updateSyncStatus("✏️ Saisie...");
       saveTimeout = setTimeout(() => {
         saveCloudData();
       }, 800);
@@ -521,6 +520,11 @@
     function resetToCurrentWeek() {
       currentDate = new Date();
       renderApp();
+    }
+
+    // Enregistrement du Service Worker pour PWA Android
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js').catch(err => console.log('SW error:', err));
     }
 
     loadCloudData();
