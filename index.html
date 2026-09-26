@@ -59,7 +59,6 @@
       gap: 10px;
     }
 
-    /* Logo MENU sur-mesure */
     .logo-img {
       width: 44px;
       height: 44px;
@@ -210,8 +209,9 @@
     .row-soir { background-color: var(--burgundy); }
     .row-notes { background-color: var(--charcoal); }
 
+    /* Case plus haute sur PC pour accueillir au moins 5 lignes */
     .cell {
-      min-height: 65px;
+      min-height: 95px;
       background: #FAFAFA;
       border: 1px dashed var(--border-color);
       border-radius: 6px;
@@ -230,7 +230,8 @@
       background: transparent;
       resize: none;
       outline: none;
-      font-size: 0.9rem;
+      font-size: 0.85rem;
+      line-height: 1.3;
       color: var(--charcoal);
     }
 
@@ -240,7 +241,7 @@
     }
 
     .cell-notes {
-      min-height: 40px;
+      min-height: 45px;
     }
 
     /* MOBILE : Vue avec étiquettes verticales (-90°) */
@@ -262,6 +263,7 @@
       .mobile-day-block {
         padding-bottom: 12px;
         border-bottom: 1px solid var(--border-color);
+        scroll-margin-top: 10px;
       }
 
       .mobile-day-block:last-child {
@@ -330,15 +332,15 @@
         background: #FFFDF9;
       }
 
-      /* Cases repas plus hautes sur mobile */
+      /* Permet 5 lignes sur mobile sans être étouffé */
       .mobile-input-container textarea {
-        min-height: 56px;
-        font-size: 0.95rem;
+        min-height: 80px;
+        font-size: 0.9rem;
+        line-height: 1.35;
       }
 
-      /* Case notes gardée compacte */
       .mobile-input-container.notes-input textarea {
-        min-height: 32px;
+        min-height: 40px;
       }
 
       header h1 {
@@ -346,18 +348,20 @@
       }
     }
 
-    /* Style temporaire appliqué lors de l'export PDF (Rendu simple N&B) */
+    /* Mode PDF d'impression : espace généreux pour 5 lignes de texte */
     .pdf-clean-mode {
       background: #FFFFFF !important;
       color: #000000 !important;
       border: 1px solid #000000 !important;
       box-shadow: none !important;
       border-radius: 0 !important;
-      padding: 10px !important;
+      padding: 8px !important;
     }
 
     .pdf-clean-mode .week-header {
       color: #000000 !important;
+      font-size: 1rem !important;
+      margin-bottom: 8px !important;
     }
 
     .pdf-clean-mode .grid-header,
@@ -369,15 +373,25 @@
       border-radius: 0 !important;
     }
 
+    .pdf-clean-mode .cell {
+      min-height: 110px !important; /* Hauteur suffisante pour 5 lignes sur PDF */
+    }
+
+    .pdf-clean-mode .cell-notes {
+      min-height: 45px !important;
+    }
+
     .pdf-clean-mode textarea {
       color: #000000 !important;
+      font-size: 0.8rem !important;
+      line-height: 1.25 !important;
     }
 
     .pdf-clean-mode textarea::placeholder {
       color: transparent !important;
     }
 
-    /* Impression classique */
+    /* Impression papier */
     @media print {
       body {
         background-color: #FFFFFF !important;
@@ -401,6 +415,9 @@
         background: #FFFFFF !important;
         padding: 10px !important;
       }
+      .cell {
+        min-height: 110px !important;
+      }
       .week-header, .grid-header, .row-label, .cell, textarea {
         background: #FFFFFF !important;
         color: #000000 !important;
@@ -416,7 +433,6 @@
 
   <header>
     <div class="logo-title">
-      <!-- Logo Vectoriel structuré selon l'image transmise -->
       <svg class="logo-img" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
         <circle cx="50" cy="32" r="22" fill="none" stroke="#161311" stroke-width="6"/>
         <line x1="38" y1="23" x2="62" y2="23" stroke="#161311" stroke-width="5" stroke-linecap="round"/>
@@ -471,6 +487,7 @@
           localStorage.setItem('ardoise_meals', JSON.stringify(mealsData));
           updateSyncStatus("🟢 Synchronisé");
           renderApp();
+          scrollToToday();
         } else {
           throw new Error("Erreur cloud");
         }
@@ -480,6 +497,7 @@
         if (local) mealsData = JSON.parse(local);
         updateSyncStatus("🟧 Mode local", true);
         renderApp();
+        scrollToToday();
       }
     }
 
@@ -528,6 +546,16 @@
       return date.getDate() === today.getDate() &&
         date.getMonth() === today.getMonth() &&
         date.getFullYear() === today.getFullYear();
+    }
+
+    // Défiler automatiquement jusqu'au jour actuel
+    function scrollToToday() {
+      setTimeout(() => {
+        const todayEl = document.getElementById('today-mobile-target');
+        if (todayEl) {
+          todayEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 200);
     }
 
     function renderWeek(mondayDate) {
@@ -615,7 +643,7 @@
             </div>
           </div>
 
-          <!-- VUE MOBILE (Étiquettes à la verticale -90°) -->
+          <!-- VUE MOBILE -->
           <div class="mobile-view">
       `;
 
@@ -624,12 +652,13 @@
         dayDate.setDate(monday.getDate() + i);
         const todayTitleClass = isToday(dayDate) ? 'today-title' : '';
         const todayInputClass = isToday(dayDate) ? 'today-input' : '';
+        const todayTargetId = isToday(dayDate) ? 'id="today-mobile-target"' : '';
         const keyMidi = `${formatDate(dayDate)}_midi`;
         const keySoir = `${formatDate(dayDate)}_soir`;
         const keyNotes = `${formatDate(dayDate)}_notes`;
 
         html += `
-          <div class="mobile-day-block">
+          <div class="mobile-day-block" ${todayTargetId}>
             <div class="mobile-day-title ${todayTitleClass}">
               <span>${DAYS[i]} ${dayDate.getDate()} ${dayDate.toLocaleDateString('fr-FR', {month: 'short'})}</span>
               ${isToday(dayDate) ? '<span>• Aujourd\'hui</span>' : ''}
@@ -700,6 +729,7 @@
     function resetToCurrentWeek() {
       currentDate = new Date();
       renderApp();
+      scrollToToday();
     }
 
     // Export PDF épuré
@@ -716,7 +746,7 @@
       element.classList.add('pdf-clean-mode');
 
       const opt = {
-        margin:       6,
+        margin:       5,
         filename:     `Ardoise_Repas_${formatDate(monday)}.pdf`,
         image:        { type: 'jpeg', quality: 0.98 },
         html2canvas:  { scale: 2 },
