@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Ardoise Repas</title>
 
-  <!-- Lien vers le Manifest et configurations PWA -->
+  <!-- Configuration PWA -->
   <link rel="manifest" href="manifest.json">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -34,8 +34,8 @@
     body {
       background-color: var(--bg-cream);
       color: var(--charcoal);
-      padding: 20px;
-      max-width: 1300px;
+      padding: 16px;
+      max-width: 1200px;
       margin: 0 auto;
     }
 
@@ -44,8 +44,8 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 24px;
-      padding-bottom: 16px;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
       border-bottom: 2px solid var(--border-color);
       flex-wrap: wrap;
       gap: 12px;
@@ -57,48 +57,62 @@
       gap: 12px;
     }
 
+    /* Logo circulaire d'origine */
     .logo-icon {
       background-color: var(--charcoal);
       color: var(--bg-cream);
-      width: 40px;
-      height: 40px;
+      width: 42px;
+      height: 42px;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
       font-weight: bold;
-      font-size: 1.2rem;
+      font-size: 1.3rem;
+      flex-shrink: 0;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    }
+
+    .logo-img {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      object-fit: cover;
     }
 
     h1 {
-      font-size: 1.5rem;
+      font-size: 1.4rem;
       color: var(--charcoal);
+      line-height: 1.1;
     }
 
     .sync-status {
-      font-size: 0.85rem;
+      font-size: 0.8rem;
       font-weight: 600;
-      color: #666;
-      margin-left: 8px;
+      color: #2E7D32;
+      display: block;
+      margin-top: 2px;
     }
 
     .controls {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 8px;
+      flex-wrap: wrap;
     }
 
     button {
       cursor: pointer;
       border: none;
       border-radius: 8px;
-      padding: 10px 16px;
+      padding: 8px 14px;
       font-weight: 600;
+      font-size: 0.9rem;
       transition: background-color 0.2s, transform 0.1s;
     }
 
     button:active {
-      transform: scale(0.98);
+      transform: scale(0.97);
     }
 
     .btn-secondary {
@@ -119,9 +133,9 @@
       background-color: var(--burgundy-hover);
     }
 
-    /* Conteneur des semaines */
+    /* Bloc Semaine */
     .week-block {
-      margin-bottom: 32px;
+      margin-bottom: 28px;
       background: var(--card-bg);
       border-radius: 12px;
       padding: 16px;
@@ -139,7 +153,15 @@
       gap: 8px;
     }
 
-    /* Grille Hebdomadaire */
+    /* DESKTOP : Table en grille */
+    .desktop-view {
+      display: block;
+    }
+
+    .mobile-view {
+      display: none;
+    }
+
     .grid-table {
       display: grid;
       grid-template-columns: 80px repeat(7, 1fr);
@@ -154,7 +176,6 @@
       border-radius: 6px;
       font-size: 0.85rem;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
     }
 
     .day-header {
@@ -194,15 +215,12 @@
     .row-soir { background-color: var(--burgundy); }
     .row-notes { background-color: var(--charcoal); }
 
-    /* Cells Inputs */
     .cell {
       min-height: 70px;
       background: #FAFAFA;
       border: 1px dashed var(--border-color);
       border-radius: 6px;
       padding: 6px;
-      display: flex;
-      flex-direction: column;
     }
 
     .cell.today-cell {
@@ -230,32 +248,101 @@
       min-height: 45px;
     }
 
-    /* Mobile View */
-    .next-week-block {
-      display: block;
-    }
+    /* MOBILE : Vue simplifiée sous forme de cartes verticales */
+    @media (max-width: 768px) {
+      body {
+        padding: 10px;
+      }
 
-    @media (max-width: 900px) {
-      body { padding: 10px; }
-      .grid-table {
-        grid-template-columns: 60px repeat(7, minmax(110px, 1fr));
-      }
-      .grid-container {
-        overflow-x: auto;
-      }
-      .next-week-block {
+      .desktop-view {
         display: none;
       }
+
+      .mobile-view {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .mobile-day-card {
+        background: #FAFAFA;
+        border: 1px solid var(--border-color);
+        border-radius: 10px;
+        padding: 12px;
+      }
+
+      .mobile-day-card.today-card {
+        border: 2px solid var(--ochre);
+        background: #FFFDF9;
+      }
+
+      .mobile-day-title {
+        font-weight: 800;
+        font-size: 1rem;
+        padding-bottom: 8px;
+        margin-bottom: 10px;
+        border-bottom: 1px solid var(--border-color);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .mobile-day-title.today-title {
+        color: var(--ochre);
+      }
+
+      .mobile-section {
+        margin-bottom: 8px;
+      }
+
+      .mobile-section-label {
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        padding: 2px 6px;
+        border-radius: 4px;
+        color: white;
+        display: inline-block;
+        margin-bottom: 4px;
+      }
+
+      .mobile-input {
+        width: 100%;
+        min-height: 48px;
+        background: white;
+        border: 1px solid var(--border-color);
+        border-radius: 6px;
+        padding: 8px;
+        font-size: 0.95rem;
+      }
+
+      .controls {
+        width: 100%;
+        justify-content: space-between;
+      }
+
+      .controls button {
+        flex: 1;
+        text-align: center;
+        padding: 10px 6px;
+        font-size: 0.8rem;
+      }
     }
 
-    /* Rendu spécial Impression / PDF : Épuré Noir & Blanc */
+    /* Impression */
     @media print {
       body {
         background-color: #FFFFFF !important;
         color: #000000 !important;
         padding: 0 !important;
       }
-      header, .controls, .btn-primary, .btn-secondary, .sync-status {
+      header, .controls, button, .sync-status {
+        display: none !important;
+      }
+      .desktop-view {
+        display: block !important;
+      }
+      .mobile-view {
         display: none !important;
       }
       .week-block {
@@ -266,36 +353,10 @@
         background: #FFFFFF !important;
         padding: 10px !important;
       }
-      .week-header {
+      .week-header, .grid-header, .row-label, .cell, textarea {
+        background: #FFFFFF !important;
         color: #000000 !important;
-      }
-      .grid-header {
-        background-color: #FFFFFF !important;
-        border: 1px solid #000000 !important;
-        color: #000000 !important;
-      }
-      .day-header.today {
-        background-color: #FFFFFF !important;
-        color: #000000 !important;
-      }
-      .day-header.today .date-num {
-        color: #000000 !important;
-      }
-      .row-label {
-        background-color: #FFFFFF !important;
-        color: #000000 !important;
-        border: 1px solid #000000 !important;
-      }
-      .cell {
-        background-color: #FFFFFF !important;
-        border: 1px solid #000000 !important;
-      }
-      .cell.today-cell {
-        border: 1px solid #000000 !important;
-        background-color: #FFFFFF !important;
-      }
-      textarea {
-        color: #000000 !important;
+        border-color: #000000 !important;
       }
       textarea::placeholder {
         color: transparent !important;
@@ -307,6 +368,7 @@
 
   <header>
     <div class="logo-title">
+      <!-- Logo circulaire d'origine -->
       <div class="logo-icon">≡</div>
       <div>
         <h1>Ardoise Repas</h1>
@@ -314,15 +376,15 @@
       </div>
     </div>
     <div class="controls">
-      <button class="btn-secondary" onclick="changeWeek(-1)">‹ Semaine précédente</button>
+      <button class="btn-secondary" onclick="changeWeek(-1)">‹ Précédent</button>
       <button class="btn-secondary" onclick="resetToCurrentWeek()">Aujourd'hui</button>
-      <button class="btn-secondary" onclick="changeWeek(1)">Semaine suivante ›</button>
-      <button class="btn-primary" onclick="window.print()">🖨️ Exporter PDF / Imprimer</button>
+      <button class="btn-secondary" onclick="changeWeek(1)">Suivant ›</button>
+      <button class="btn-primary" onclick="window.print()">🖨️ Imprimer</button>
     </div>
   </header>
 
   <main id="app-container">
-    <!-- Les tableaux de semaines seront injectés dynamiquement ici -->
+    <!-- Contenu injecté dynamiquement -->
   </main>
 
   <script>
@@ -331,7 +393,8 @@
     let mealsData = {};
     let saveTimeout = null;
 
-    const DAYS = ['LUN', 'MAR', 'MER', 'JEU', 'VEN', 'SAM', 'DIM'];
+    const DAYS = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
+    const DAYS_SHORT = ['LUN', 'MAR', 'MER', 'JEU', 'VEN', 'SAM', 'DIM'];
 
     function updateSyncStatus(status, isError = false) {
       const statusEl = document.getElementById('sync-status');
@@ -355,10 +418,10 @@
           throw new Error("Erreur cloud");
         }
       } catch (err) {
-        console.warn("Chargement hors-ligne", err);
+        console.warn("Mode hors-ligne", err);
         const local = localStorage.getItem('ardoise_meals');
         if (local) mealsData = JSON.parse(local);
-        updateSyncStatus("🟧 Mode local (hors-ligne)", true);
+        updateSyncStatus("🟧 Mode local", true);
         renderApp();
       }
     }
@@ -402,7 +465,7 @@
         date.getFullYear() === today.getFullYear();
     }
 
-    function renderWeek(mondayDate, titleLabel, isNextWeekClass = '') {
+    function renderWeek(mondayDate, titleLabel) {
       const monday = new Date(mondayDate);
       const sunday = new Date(monday);
       sunday.setDate(monday.getDate() + 6);
@@ -410,15 +473,18 @@
       const dateRangeStr = `${monday.getDate()} ${monday.toLocaleDateString('fr-FR', {month: 'short'})} – ${sunday.getDate()} ${sunday.toLocaleDateString('fr-FR', {month: 'short'})} ${sunday.getFullYear()}`;
 
       let html = `
-        <div class="week-block ${isNextWeekClass}">
+        <div class="week-block">
           <div class="week-header">
             📅 ${titleLabel} (${dateRangeStr})
           </div>
-          <div class="grid-container">
+
+          <!-- VUE DESKTOP (Grille) -->
+          <div class="desktop-view">
             <div class="grid-table">
               <div class="grid-header">JOUR</div>
       `;
 
+      // En-têtes Desktop
       for (let i = 0; i < 7; i++) {
         const dayDate = new Date(monday);
         dayDate.setDate(monday.getDate() + i);
@@ -426,13 +492,13 @@
         
         html += `
           <div class="grid-header day-header ${todayClass}">
-            <span>${DAYS[i]}</span>
+            <span>${DAYS_SHORT[i]}</span>
             <span class="date-num">${dayDate.getDate()}</span>
           </div>
         `;
       }
 
-      // Ligne MIDI
+      // Ligne MIDI Desktop
       html += `<div class="row-label row-midi">MIDI</div>`;
       for (let i = 0; i < 7; i++) {
         const dayDate = new Date(monday);
@@ -448,7 +514,7 @@
         `;
       }
 
-      // Ligne SOIR
+      // Ligne SOIR Desktop
       html += `<div class="row-label row-soir">SOIR</div>`;
       for (let i = 0; i < 7; i++) {
         const dayDate = new Date(monday);
@@ -464,7 +530,7 @@
         `;
       }
 
-      // Ligne NOTES
+      // Ligne NOTES Desktop
       html += `<div class="row-label row-notes">NOTES</div>`;
       for (let i = 0; i < 7; i++) {
         const dayDate = new Date(monday);
@@ -475,13 +541,54 @@
 
         html += `
           <div class="cell cell-notes ${todayCell}">
-            <textarea placeholder="Note du jour..." data-key="${key}" oninput="handleInput(this)">${val}</textarea>
+            <textarea placeholder="Note..." data-key="${key}" oninput="handleInput(this)">${val}</textarea>
           </div>
         `;
       }
 
       html += `
             </div>
+          </div>
+
+          <!-- VUE MOBILE (Cartes par jour) -->
+          <div class="mobile-view">
+      `;
+
+      for (let i = 0; i < 7; i++) {
+        const dayDate = new Date(monday);
+        dayDate.setDate(monday.getDate() + i);
+        const todayClass = isToday(dayDate) ? 'today-card' : '';
+        const todayTitleClass = isToday(dayDate) ? 'today-title' : '';
+        const keyMidi = `${formatDate(dayDate)}_midi`;
+        const keySoir = `${formatDate(dayDate)}_soir`;
+        const keyNotes = `${formatDate(dayDate)}_notes`;
+
+        html += `
+          <div class="mobile-day-card ${todayClass}">
+            <div class="mobile-day-title ${todayTitleClass}">
+              <span>${DAYS[i]} ${dayDate.getDate()} ${dayDate.toLocaleDateString('fr-FR', {month: 'short'})}</span>
+              ${isToday(dayDate) ? '<span>• Aujourd\'hui</span>' : ''}
+            </div>
+
+            <div class="mobile-section">
+              <span class="mobile-section-label row-midi">MIDI</span>
+              <textarea class="mobile-input" placeholder="+ Repas midi" data-key="${keyMidi}" oninput="handleInput(this)">${mealsData[keyMidi] || ''}</textarea>
+            </div>
+
+            <div class="mobile-section">
+              <span class="mobile-section-label row-soir">SOIR</span>
+              <textarea class="mobile-input" placeholder="+ Repas soir" data-key="${keySoir}" oninput="handleInput(this)">${mealsData[keySoir] || ''}</textarea>
+            </div>
+
+            <div class="mobile-section">
+              <span class="mobile-section-label row-notes">NOTES</span>
+              <textarea class="mobile-input" placeholder="Note du jour..." data-key="${keyNotes}" oninput="handleInput(this)">${mealsData[keyNotes] || ''}</textarea>
+            </div>
+          </div>
+        `;
+      }
+
+      html += `
           </div>
         </div>
       `;
@@ -498,7 +605,7 @@
 
       container.innerHTML = 
         renderWeek(mondayCurrent, "Cette semaine") + 
-        renderWeek(mondayNext, "Semaine prochaine", "next-week-block");
+        renderWeek(mondayNext, "Semaine prochaine");
     }
 
     function handleInput(textarea) {
@@ -522,7 +629,6 @@
       renderApp();
     }
 
-    // Enregistrement du Service Worker pour PWA Android
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('sw.js').catch(err => console.log('SW error:', err));
     }
