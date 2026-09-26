@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ardoise Repas</title>
+  <style>
+    :root {
+      --bg-cream: #F2EFE9;
+      --burgundy: #9E2A2B;
+      --burgundy-hover: #7E2122;
+      --ochre: #E08E2E;
+      --charcoal: #161311;
+      --card-bg: #FFFFFF;
+      --border-color: #E2DDD5;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-cream);
+      color: var(--charcoal);
+      padding: 20px;
+      max-width: 1300px;
+      margin: 0 auto;
+    }
+
+    /* En-tête */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 2px solid var(--border-color);
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .logo-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo-icon {
+      background-color: var(--charcoal);
+      color: var(--bg-cream);
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 1.2rem;
+    }
+
+    h1 {
+      font-size: 1.5rem;
+      color: var(--charcoal);
+    }
+
+    .controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    button {
+      cursor: pointer;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 16px;
+      font-weight: 600;
+      transition: background-color 0.2s, transform 0.1s;
+    }
+
+    button:active {
+      transform: scale(0.98);
+    }
+
+    .btn-secondary {
+      background-color: #E6E1D7;
+      color: var(--charcoal);
+    }
+
+    .btn-secondary:hover {
+      background-color: #DAD4C7;
+    }
+
+    .btn-primary {
+      background-color: var(--burgundy);
+      color: #FFFFFF;
+    }
+
+    .btn-primary:hover {
+      background-color: var(--burgundy-hover);
+    }
+
+    /* Conteneur des semaines */
+    .week-block {
+      margin-bottom: 32px;
+      background: var(--card-bg);
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+      border: 1px solid var(--border-color);
+    }
+
+    .week-header {
+      font-size: 1.1rem;
+      font-weight: bold;
+      color: var(--burgundy);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Grille Hebdomadaire */
+    .grid-table {
+      display: grid;
+      grid-template-columns: 80px repeat(7, 1fr);
+      gap: 8px;
+    }
+
+    .grid-header {
+      font-weight: bold;
+      text-align: center;
+      padding: 8px;
+      background-color: var(--bg-cream);
+      border-radius: 6px;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .day-header {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .day-header .date-num {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: var(--charcoal);
+    }
+
+    .day-header.today {
+      background-color: var(--ochre);
+      color: white;
+    }
+
+    .day-header.today .date-num {
+      color: white;
+    }
+
+    .row-label {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 0.8rem;
+      border-radius: 6px;
+      color: white;
+      text-transform: uppercase;
+    }
+
+    .row-midi { background-color: var(--ochre); }
+    .row-soir { background-color: var(--burgundy); }
+    .row-notes { background-color: var(--charcoal); }
+
+    /* Cells Inputs */
+    .cell {
+      min-height: 70px;
+      background: #FAFAFA;
+      border: 1px dashed var(--border-color);
+      border-radius: 6px;
+      padding: 6px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .cell.today-cell {
+      border: 2px solid var(--ochre);
+      background-color: #FFFDF9;
+    }
+
+    textarea {
+      width: 100%;
+      height: 100%;
+      border: none;
+      background: transparent;
+      resize: none;
+      outline: none;
+      font-size: 0.9rem;
+      color: var(--charcoal);
+    }
+
+    textarea::placeholder {
+      color: #B0A8A0;
+      font-size: 0.8rem;
+    }
+
+    .cell-notes {
+      min-height: 45px;
+    }
+
+    /* Adaptive Mobile View */
+    .next-week-block {
+      display: block;
+    }
+
+    @media (max-width: 900px) {
+      body { padding: 10px; }
+      .grid-table {
+        grid-template-columns: 60px repeat(7, minmax(110px, 1fr));
+      }
+      .grid-container {
+        overflow-x: auto;
+      }
+      /* Masquer la 2ème semaine sur très petit écran pour alléger */
+      .next-week-block {
+        display: none;
+      }
+    }
+
+    /* Rendu spécial Impression / PDF : Épuré Noir & Blanc */
+    @media print {
+      body {
+        background-color: #FFFFFF !important;
+        color: #000000 !important;
+        padding: 0 !important;
+      }
+      header, .controls, .btn-primary, .btn-secondary {
+        display: none !important;
+      }
+      .week-block {
+        box-shadow: none !important;
+        border: 1px solid #000000 !important;
+        page-break-inside: avoid;
+        margin-bottom: 20px !important;
+        background: #FFFFFF !important;
+        padding: 10px !important;
+      }
+      .week-header {
+        color: #000000 !important;
+      }
+      .grid-header {
+        background-color: #FFFFFF !important;
+        border: 1px solid #000000 !important;
+        color: #000000 !important;
+      }
+      .day-header.today {
+        background-color: #FFFFFF !important;
+        color: #000000 !important;
+      }
+      .day-header.today .date-num {
+        color: #000000 !important;
+      }
+      .row-label {
+        background-color: #FFFFFF !important;
+        color: #000000 !important;
+        border: 1px solid #000000 !important;
+      }
+      .cell {
+        background-color: #FFFFFF !important;
+        border: 1px solid #000000 !important;
+      }
+      .cell.today-cell {
+        border: 1px solid #000000 !important;
+        background-color: #FFFFFF !important;
+      }
+      textarea {
+        color: #000000 !important;
+      }
+      textarea::placeholder {
+        color: transparent !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="logo-title">
+      <div class="logo-icon">≡</div>
+      <h1>Ardoise Repas</h1>
+    </div>
+    <div class="controls">
+      <button class="btn-secondary" onclick="changeWeek(-1)">‹ Semaine précédente</button>
+      <button class="btn-secondary" onclick="resetToCurrentWeek()">Aujourd'hui</button>
+      <button class="btn-secondary" onclick="changeWeek(1)">Semaine suivante ›</button>
+      <button class="btn-primary" onclick="window.print()">🖨️ Exporter PDF / Imprimer</button>
+    </div>
+  </header>
+
+  <main id="app-container">
+    <!-- Les tableaux de semaines seront injectés dynamiquement ici -->
+  </main>
+
+  <script>
+    let currentDate = new Date();
+
+    const DAYS = ['LUN', 'MAR', 'MER', 'JEU', 'VEN', 'SAM', 'DIM'];
+
+    function getMonday(d) {
+      const date = new Date(d);
+      const day = date.getDay();
+      const diff = date.getDate() - day + (day === 0 ? -6 : 1);
+      return new Date(date.setDate(diff));
+    }
+
+    function formatDate(date) {
+      return date.toISOString().split('T')[0];
+    }
+
+    function isToday(date) {
+      const today = new Date();
+      return date.getDate() === today.getDate() &&
+        date.getMonth() === today.getMonth() &&
+        date.getFullYear() === today.getFullYear();
+    }
+
+    function renderWeek(mondayDate, titleLabel, isNextWeekClass = '') {
+      const monday = new Date(mondayDate);
+      const sunday = new Date(monday);
+      sunday.setDate(monday.getDate() + 6);
+
+      const dateRangeStr = `${monday.getDate()} ${monday.toLocaleDateString('fr-FR', {month: 'short'})} – ${sunday.getDate()} ${sunday.toLocaleDateString('fr-FR', {month: 'short'})} ${sunday.getFullYear()}`;
+
+      let html = `
+        <div class="week-block ${isNextWeekClass}">
+          <div class="week-header">
+            📅 ${titleLabel} (${dateRangeStr})
+          </div>
+          <div class="grid-container">
+            <div class="grid-table">
+              <!-- En-tête Jours -->
+              <div class="grid-header">JOUR</div>
+      `;
+
+      // Colonnes Jours
+      for (let i = 0; i < 7; i++) {
+        const dayDate = new Date(monday);
+        dayDate.setDate(monday.getDate() + i);
+        const todayClass = isToday(dayDate) ? 'today' : '';
+        
+        html += `
+          <div class="grid-header day-header ${todayClass}">
+            <span>${DAYS[i]}</span>
+            <span class="date-num">${dayDate.getDate()}</span>
+          </div>
+        `;
+      }
+
+      // Ligne MIDI
+      html += `<div class="row-label row-midi">MIDI</div>`;
+      for (let i = 0; i < 7; i++) {
+        const dayDate = new Date(monday);
+        dayDate.setDate(monday.getDate() + i);
+        const key = `${formatDate(dayDate)}_midi`;
+        const val = localStorage.getItem(key) || '';
+        const todayCell = isToday(dayDate) ? 'today-cell' : '';
+
+        html += `
+          <div class="cell ${todayCell}">
+            <textarea placeholder="+ Repas midi" data-key="${key}" oninput="saveData(this)">${val}</textarea>
+          </div>
+        `;
+      }
+
+      // Ligne SOIR
+      html += `<div class="row-label row-soir">SOIR</div>`;
+      for (let i = 0; i < 7; i++) {
+        const dayDate = new Date(monday);
+        dayDate.setDate(monday.getDate() + i);
+        const key = `${formatDate(dayDate)}_soir`;
+        const val = localStorage.getItem(key) || '';
+        const todayCell = isToday(dayDate) ? 'today-cell' : '';
+
+        html += `
+          <div class="cell ${todayCell}">
+            <textarea placeholder="+ Repas soir" data-key="${key}" oninput="saveData(this)">${val}</textarea>
+          </div>
+        `;
+      }
+
+      // Ligne NOTES
+      html += `<div class="row-label row-notes">NOTES</div>`;
+      for (let i = 0; i < 7; i++) {
+        const dayDate = new Date(monday);
+        dayDate.setDate(monday.getDate() + i);
+        const key = `${formatDate(dayDate)}_notes`;
+        const val = localStorage.getItem(key) || '';
+        const todayCell = isToday(dayDate) ? 'today-cell' : '';
+
+        html += `
+          <div class="cell cell-notes ${todayCell}">
+            <textarea placeholder="Note du jour..." data-key="${key}" oninput="saveData(this)">${val}</textarea>
+          </div>
+        `;
+      }
+
+      html += `
+            </div>
+          </div>
+        </div>
+      `;
+
+      return html;
+    }
+
+    function renderApp() {
+      const container = document.getElementById('app-container');
+      const mondayCurrent = getMonday(currentDate);
+      
+      const mondayNext = new Date(mondayCurrent);
+      mondayNext.setDate(mondayCurrent.getDate() + 7);
+
+      container.innerHTML = 
+        renderWeek(mondayCurrent, "Cette semaine") + 
+        renderWeek(mondayNext, "Semaine prochaine", "next-week-block");
+    }
+
+    function saveData(textarea) {
+      const key = textarea.getAttribute('data-key');
+      localStorage.setItem(key, textarea.value);
+    }
+
+    function changeWeek(direction) {
+      currentDate.setDate(currentDate.getDate() + (direction * 7));
+      renderApp();
+    }
+
+    function resetToCurrentWeek() {
+      currentDate = new Date();
+      renderApp();
+    }
+
+    // Initialisation au chargement
+    renderApp();
+  </script>
+</body>
+</html>
