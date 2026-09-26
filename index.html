@@ -13,6 +13,9 @@
   <meta name="apple-mobile-web-app-title" content="Ardoise Repas">
   <meta name="theme-color" content="#161311">
 
+  <!-- Bibliothèque pour générer le PDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
   <style>
     :root {
       --bg-cream: #F2EFE9;
@@ -57,7 +60,6 @@
       gap: 12px;
     }
 
-    /* Logo circulaire d'origine */
     .logo-icon {
       background-color: var(--charcoal);
       color: var(--bg-cream);
@@ -126,13 +128,13 @@
       background-color: var(--burgundy-hover);
     }
 
-    .btn-share {
-      background-color: #25D366;
+    .btn-pdf {
+      background-color: #2E7D32;
       color: #FFFFFF;
     }
 
-    .btn-share:hover {
-      background-color: #1EBE5D;
+    .btn-pdf:hover {
+      background-color: #236127;
     }
 
     /* Bloc Semaine */
@@ -331,7 +333,13 @@
       }
     }
 
-    /* Impression & Export PDF */
+    /* Rendu d'export PDF & Impression Noir et Blanc */
+    .print-export {
+      background: #FFFFFF !important;
+      color: #000000 !important;
+      padding: 10px !important;
+    }
+
     @media print {
       body {
         background-color: #FFFFFF !important;
@@ -380,8 +388,8 @@
       <button class="btn-secondary" onclick="changeWeek(-1)">‹ Précédent</button>
       <button class="btn-secondary" onclick="resetToCurrentWeek()">Aujourd'hui</button>
       <button class="btn-secondary" onclick="changeWeek(1)">Suivant ›</button>
-      <button class="btn-share" onclick="shareWeekWhatsApp()">📲 Partager / WhatsApp</button>
-      <button class="btn-primary" onclick="window.print()">🖨️ PDF / Imprimer</button>
+      <button class="btn-pdf" onclick="exportToPDF()">📄 Télécharger PDF</button>
+      <button class="btn-primary" onclick="window.print()">🖨️ Imprimer</button>
     </div>
   </header>
 
@@ -475,7 +483,7 @@
       const dateRangeStr = `${monday.getDate()} ${monday.toLocaleDateString('fr-FR', {month: 'short'})} – ${sunday.getDate()} ${sunday.toLocaleDateString('fr-FR', {month: 'short'})} ${sunday.getFullYear()}`;
 
       let html = `
-        <div class="week-block">
+        <div class="week-block" id="week-block-pdf">
           <div class="week-header">
             📅 ${titleLabel} (${dateRangeStr})
           </div>
@@ -486,7 +494,6 @@
               <div class="grid-header">JOUR</div>
       `;
 
-      // En-têtes Desktop
       for (let i = 0; i < 7; i++) {
         const dayDate = new Date(monday);
         dayDate.setDate(monday.getDate() + i);
@@ -631,41 +638,35 @@
       renderApp();
     }
 
-    // Partager la semaine par WhatsApp / Menu de partage natif
-    function shareWeekWhatsApp() {
+    // Export direct du tableau en fichier PDF imprimable
+    function exportToPDF() {
+      updateSyncStatus("⏳ Génération PDF...");
       const monday = getMonday(currentDate);
-      const sunday = new Date(monday);
-      sunday.setDate(monday.getDate() + 6);
+      const element = document.getElementById('week-block-pdf');
 
-      let text = `🍽️ *Ardoise Repas* (${monday.getDate()} au ${sunday.getDate()} ${sunday.toLocaleDateString('fr-FR', {month: 'long'})})\n\n`;
+      // Forcer temporairement l'affichage desktop pour le PDF
+      const desktopView = element.querySelector('.desktop-view');
+      const mobileView = element.querySelector('.mobile-view');
+      if (desktopView) desktopView.style.display = 'block';
+      if (mobileView) mobileView.style.display = 'none';
 
-      for (let i = 0; i < 7; i++) {
-        const dayDate = new Date(monday);
-        dayDate.setDate(monday.getDate() + i);
-        const dateStr = formatDate(dayDate);
-        
-        const midi = mealsData[`${dateStr}_midi`]?.trim();
-        const soir = mealsData[`${dateStr}_soir`]?.trim();
-        const notes = mealsData[`${dateStr}_notes`]?.trim();
+      const opt = {
+        margin:       8,
+        filename:     `Ardoise_Repas_${formatDate(monday)}.pdf`,
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { scale: 2 },
+        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'landscape' }
+      };
 
-        if (midi || soir || notes) {
-          text += `📌 *${DAYS[i]} ${dayDate.getDate()}*\n`;
-          if (midi) text += `  ☀️ Midi : ${midi}\n`;
-          if (soir) text += `  🌙 Soir : ${soir}\n`;
-          if (notes) text += `  📝 Note : ${notes}\n`;
-          text += `\n`;
-        }
-      }
-
-      if (navigator.share) {
-        navigator.share({
-          title: 'Ardoise Repas',
-          text: text
-        }).catch((err) => console.log('Partage annulé'));
-      } else {
-        const encodedText = encodeURIComponent(text);
-        window.open(`https://api.whatsapp.com/send?text=${encodedText}`, '_blank');
-      }
+      html2pdf().set(opt).from(element).save().then(() => {
+        // Rétablir la vue initiale
+        if (desktopView) desktopView.style.display = '';
+        if (mobileView) mobileView.style.display = '';
+        updateSyncStatus("🟢 Synchronisé");
+      }).catch(err => {
+        console.error('Erreur PDF:', err);
+        updateSyncStatus("⚠️ Erreur PDF", true);
+      });
     }
 
     if ('serviceWorker' in navigator) {
