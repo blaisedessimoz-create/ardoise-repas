@@ -333,13 +333,38 @@
       }
     }
 
-    /* Rendu d'export PDF & Impression Noir et Blanc */
-    .print-export {
+    /* Style temporaire applique lors de l'export PDF (Rendu simple N&B) */
+    .pdf-clean-mode {
       background: #FFFFFF !important;
       color: #000000 !important;
+      border: 1px solid #000000 !important;
+      box-shadow: none !important;
+      border-radius: 0 !important;
       padding: 10px !important;
     }
 
+    .pdf-clean-mode .week-header {
+      color: #000000 !important;
+    }
+
+    .pdf-clean-mode .grid-header,
+    .pdf-clean-mode .row-label,
+    .pdf-clean-mode .cell {
+      background: #FFFFFF !important;
+      color: #000000 !important;
+      border: 1px solid #000000 !important;
+      border-radius: 0 !important;
+    }
+
+    .pdf-clean-mode textarea {
+      color: #000000 !important;
+    }
+
+    .pdf-clean-mode textarea::placeholder {
+      color: transparent !important;
+    }
+
+    /* Impression classique */
     @media print {
       body {
         background-color: #FFFFFF !important;
@@ -394,7 +419,7 @@
   </header>
 
   <main id="app-container">
-    <!-- Contenu injecté dynamiquement -->
+    <!-- Contenu injecte dynamiquement -->
   </main>
 
   <script>
@@ -638,20 +663,22 @@
       renderApp();
     }
 
-    // Export direct du tableau en fichier PDF imprimable
+    // Export PDF épuré identique à l'impression
     function exportToPDF() {
       updateSyncStatus("⏳ Génération PDF...");
       const monday = getMonday(currentDate);
       const element = document.getElementById('week-block-pdf');
 
-      // Forcer temporairement l'affichage desktop pour le PDF
+      // Forcer l'affichage de la grille Desktop et appliquer le mode simple N&B
       const desktopView = element.querySelector('.desktop-view');
       const mobileView = element.querySelector('.mobile-view');
+      
       if (desktopView) desktopView.style.display = 'block';
       if (mobileView) mobileView.style.display = 'none';
+      element.classList.add('pdf-clean-mode');
 
       const opt = {
-        margin:       8,
+        margin:       6,
         filename:     `Ardoise_Repas_${formatDate(monday)}.pdf`,
         image:        { type: 'jpeg', quality: 0.98 },
         html2canvas:  { scale: 2 },
@@ -659,12 +686,16 @@
       };
 
       html2pdf().set(opt).from(element).save().then(() => {
-        // Rétablir la vue initiale
+        // Restaurer la vue normale
+        element.classList.remove('pdf-clean-mode');
         if (desktopView) desktopView.style.display = '';
         if (mobileView) mobileView.style.display = '';
         updateSyncStatus("🟢 Synchronisé");
       }).catch(err => {
         console.error('Erreur PDF:', err);
+        element.classList.remove('pdf-clean-mode');
+        if (desktopView) desktopView.style.display = '';
+        if (mobileView) mobileView.style.display = '';
         updateSyncStatus("⚠️ Erreur PDF", true);
       });
     }
