@@ -42,13 +42,17 @@
       margin: 0 auto;
     }
 
-    /* En-tête épuré sans icône */
+    /* En-tête volant (Sticky Header) */
     header {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      background-color: var(--bg-cream);
       display: flex;
       justify-content: space-between;
       align-items: center;
+      padding: 10px 0;
       margin-bottom: 16px;
-      padding-bottom: 10px;
       border-bottom: 2px solid var(--border-color);
       gap: 8px;
     }
@@ -268,7 +272,7 @@
       .mobile-day-block {
         padding-bottom: 12px;
         border-bottom: 1px solid var(--border-color);
-        scroll-margin-top: 10px;
+        scroll-margin-top: 70px; /* Offset pour l'en-tête volant */
       }
 
       .mobile-day-block:last-child {
@@ -351,7 +355,7 @@
       }
     }
 
-    /* Mode PDF d'impression : Rendu épuré, zéro scrollbar */
+    /* Mode PDF d'impression */
     .pdf-clean-mode {
       background: #FFFFFF !important;
       color: #000000 !important;
@@ -551,13 +555,14 @@
         date.getFullYear() === today.getFullYear();
     }
 
+    // Ancrage précis et immédiat sur le jour courant
     function scrollToToday() {
       setTimeout(() => {
         const todayEl = document.getElementById('today-mobile-target');
         if (todayEl) {
           todayEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
-      }, 200);
+      }, 150);
     }
 
     function renderWeek(mondayDate, isFirstWeek = false) {
